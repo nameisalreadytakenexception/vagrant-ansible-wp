@@ -1,0 +1,45 @@
+---
+# tasks file for wordpress
+- name: Install packages
+  yum:
+    name:
+      - php
+      - php-common 
+      - php-mysql 
+      - php-gd 
+      - php-xml 
+      - php-mbstring 
+      - php-mcrypt 
+      - php-xmlrpc 
+      - unzip 
+      - wget
+    state: present
+
+- name: download wordpress
+  unarchive:
+    src: https://wordpress.org/wordpress-5.1.1.tar.gz #http://wordpress.org/latest.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: copy wordpress
+  shell: cp -avr /tmp/wordpress/* /var/www/html/
+
+- name: create uploads dir
+  file:
+    path: /var/www/html/wp-content/uploads
+    owner: apache
+    group: apache
+    state: directory
+
+- name: add wp config
+  template: 
+    src: templates/wp-config.j2 
+    dest: /var/www/html/wp-config.php
+
+- name: Change file ownership, group and permissions
+  file:
+    path: /var/www/html/
+    owner: apache
+    group: apache
+    mode: '0755'
+  notify: restart httpd

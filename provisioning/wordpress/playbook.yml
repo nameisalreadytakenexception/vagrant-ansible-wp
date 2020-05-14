@@ -1,0 +1,8 @@
+---
+- name: wordpress
+  hosts: wordpress
+  become: yes
+  roles: 
+    - mysql
+    - httpd
+    - wordpress

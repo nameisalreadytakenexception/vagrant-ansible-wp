@@ -1,0 +1,39 @@
+---
+# tasks file for mysql
+- name: add mysql repo
+  shell: rpm -Uhv http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm
+  ignore_errors: yes
+
+- name: upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: install mysql packages
+  yum:
+    name:
+      - mysql-community-server
+      - MySQL-python
+    state: present
+ # notify: start_mysql
+
+- name: start mysql
+  systemd:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: Create wordpress db user
+  mysql_user:
+    name: "{{wordpress_db_user}}" 
+    password: "{{wordpress_db_pass}}"
+    priv: '*.*:ALL,GRANT'
+    state: present
+    host: "localhost" #"%"
+
+- name: Create wordpress db
+  mysql_db:
+    name: "{{wordpress_db}}" 
+    state: present
+    login_user: "{{wordpress_db_user}}" 
+    login_password: "{{wordpress_db_pass}}"
